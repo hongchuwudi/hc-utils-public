@@ -1,0 +1,112 @@
+{
+  "name": "hc-utils-web-electron",
+  "private": true,
+  "version": "1.0.0",
+  "description": "HC工具集 - 多功能桌面应用",
+  "author": "hongchu",
+  "license": "MIT",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "electron:build-main": "tsc -p tsconfig.electron.json",
+    "electron:dev": "npm run electron:build-main && concurrently \"npm run dev\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron dist-electron/main.js\"",
+    "electron:serve": "npm run build && npm run electron:build-main && electron dist-electron/main.js",
+    "build:type-check": "vue-tsc -b && vite build",
+    "electron:build": "npm run build && npm run electron:build-main && electron-builder --win portable --x64",
+    "electron:build-part3": "electron-builder --win portable --x64",
+    "electron:build-mac": "npm run build && npm run electron:build-main && electron-builder --mac --dir",
+    "electron:build-mac-part3-x64": "electron-builder --mac --x64 --dir",
+    "electron:build-mac-x64": "npm run build && npm run electron:build-main && electron-builder --mac --x64 --dir",
+    "electron:build-mac-arm64": "npm run build && npm run electron:build-main && electron-builder --mac --arm64 --dir",
+    "electron:build-mac-universal": "npm run build && npm run electron:build-main && electron-builder --mac --universal --dir",
+    "postinstall": "npm run electron:build-main"
+  },
+  "dependencies": {
+    "@electron-toolkit/utils": "^4.0.0",
+    "@types/node": "^24.5.2",
+    "@vueuse/core": "^13.9.0",
+    "ant-design-vue": "^4.2.6",
+    "axios": "^1.12.2",
+    "fs-extra": "^11.3.2",
+    "howler.js": "^2.1.2",
+    "lodash-es": "^4.17.21",
+    "lucide-vue-next": "^0.544.0",
+    "markdown-it": "^14.1.0",
+    "pinia": "^2.2.3",
+    "pinia-plugin-persistedstate": "^3.2.3",
+    "stream": "^0.0.3",
+    "vue": "^3.5.21",
+    "vue-router": "^4.4.3",
+    "wavesurfer.js": "^7.10.3"
+  },
+  "devDependencies": {
+    "@types/howler": "^2.2.12",
+    "@types/lodash-es": "^4.17.12",
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^20.19.18",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/tsconfig": "^0.8.1",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^38.2.1",
+    "electron-builder": "^26.0.12",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.7",
+    "vue-tsc": "^3.0.7",
+    "wait-on": "^9.0.1"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "electron"
+      ]
+    }
+  },
+  "build": {
+    "asar": true,
+    "appId": "com.hongchu.hc-utils-web",
+    "productName": "HCUtils",
+    "directories": {
+      "output": "dist_electron_build"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/favicon.ico"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dir",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "build/icons/icon.icns",
+      "category": "public.app-category.utilities",
+      "darkModeSupport": true,
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "应用需要访问麦克风来进行音频录制功能",
+        "NSCameraUsageDescription": "应用需要访问摄像头来进行视频相关功能"
+      }
+    }
+  }
+}

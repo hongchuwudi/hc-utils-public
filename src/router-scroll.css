@@ -1,0 +1,52 @@
+/* 全局禁用所有滚动条 */
+* {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+*::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* 为特定组件重新启用自定义滚动条 */
+.custom-scrollbar {
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(59, 130, 246, 0.5) transparent !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    display: block !important;
+    width: 8px !important;
+    height: 8px !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent !important;
+    border-radius: 4px !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg,
+    rgba(59, 130, 246, 0.6) 0%,
+    rgba(37, 99, 235, 0.6) 50%,
+    rgba(59, 130, 246, 0.6) 100%) !important;
+    border-radius: 4px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    transition: all 0.3s ease !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg,
+    rgba(59, 130, 246, 0.8) 0%,
+    rgba(37, 99, 235, 0.8) 50%,
+    rgba(59, 130, 246, 0.8) 100%) !important;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg,
+    rgba(96, 165, 250, 0.6) 0%,
+    rgba(59, 130, 246, 0.6) 50%,
+    rgba(96, 165, 250, 0.6) 100%) !important;
+}
