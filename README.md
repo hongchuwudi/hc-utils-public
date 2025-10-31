@@ -23,13 +23,14 @@
 
 1. **克隆项目**
 ```bash
-git clone <项目地址>
+git clone git@github.com:hongchuwudi/hc-utils-public.git
 cd hc-utils-web
 ```
 
 2. **安装依赖**
 ```bash
-npm install
+npm install -g cnpm --registry=https://registry.npmmirror.com
+cnpm install
 ```
 
 3. **开发模式运行**
