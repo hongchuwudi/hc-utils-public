@@ -20,6 +20,15 @@
             tooltip="帮助"
             tooltip-position="bottom"
         />
+        <!-- 是否显示底部播放栏-->
+        <ProButton
+            type="secondary"
+            size="sm"
+            :icon="playStore.isShowBottomPlayer ? Eye : EyeOff"
+            @click="playStore.toggleBottomPlayer"
+            :tooltip="playStore.isShowBottomPlayer ? '隐藏底部播放栏' : '显示底部播放栏'"
+            tooltip-position="bottom"
+        />
         <!-- 刷新按钮 -->
         <ProButton
             type="secondary"
@@ -103,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-import {ListMusic, TextSearch, FolderCog, FolderHeart, Trash2, RefreshCw,Info} from 'lucide-vue-next'
+import {ListMusic, TextSearch, FolderCog, FolderHeart, Trash2, RefreshCw, Info, Eye, EyeOff} from 'lucide-vue-next'
 import ProButton from '@/components/common/proButton.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import {useFavoriteStore} from "../../../stores/favoriteStore.ts";
@@ -111,7 +120,9 @@ import { message } from 'ant-design-vue'
 import { ref } from 'vue'
 import NoticeBoard from "@/components/common/NoticeBoard.vue";
 import {musicNotify} from "../../../text/musicNotify.ts";
+import {usePlayerStore} from "../../../stores/playerStore.ts";
 
+const playStore = usePlayerStore()
 const favoriteStore = useFavoriteStore()
 const confirmModal = ref()
 const refreshing = ref(false)

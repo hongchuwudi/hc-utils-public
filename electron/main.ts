@@ -5,7 +5,7 @@ const isDev = process.env.NODE_ENV === 'development'
 
 // 初始化应用
 app.whenReady().then(() => {
-    console.log('[app] ready')
+    console.log('[app] ready就绪....')
     AppManager.initialize(isDev)
 })
 

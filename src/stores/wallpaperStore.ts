@@ -16,6 +16,8 @@ export const useWallpaperStore = defineStore('wallpaper', () => {
     // 当前使用的壁纸
     const currentWallpaper = ref<Wallpaper | null>(null)
     const videoVolume = ref(0) // 默认静音
+    // 添加视频播放进度状态
+    const videoProgress = ref(0) // 0-1 之间的进度值
 
     // 增：添加壁纸链接
     const addWallpaper = (name: string, path: string, type: 'image' | 'video') => {
@@ -46,6 +48,8 @@ export const useWallpaperStore = defineStore('wallpaper', () => {
     // 改：设置当前壁纸
     const setCurrentWallpaper = (wallpaper: Wallpaper | null) => {
         currentWallpaper.value = wallpaper
+        // 切换壁纸时重置进度
+        videoProgress.value = 0
     }
 
     // 查：获取所有壁纸
@@ -63,16 +67,31 @@ export const useWallpaperStore = defineStore('wallpaper', () => {
         videoVolume.value = videoVolume.value > 0 ? 0 : 0.5 // 静音时恢复为 0.5
     }
 
+    // 设置视频播放进度
+    const setVideoProgress = (progress: number) => {
+        // 确保进度在 0-1 范围内
+        videoProgress.value = Math.max(0, Math.min(1, progress))
+        console.log('设置视频进度', videoProgress.value)
+    }
+
+    // 重置视频进度（可选）
+    const resetVideoProgress = () => {
+        videoProgress.value = 0
+    }
+
     return {
         wallpapers,
         currentWallpaper,
         videoVolume,
+        videoProgress, // 导出进度状态
         addWallpaper,
         removeWallpaper,
         setCurrentWallpaper,
         getWallpapers,
         setVideoVolume,
-        toggleMute
+        toggleMute,
+        setVideoProgress,
+        resetVideoProgress // 导出重置函数
     }
 }, {
     persist: true

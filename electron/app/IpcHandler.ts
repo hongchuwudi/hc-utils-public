@@ -1,4 +1,4 @@
-import { ipcMain, dialog } from 'electron'
+import { ipcMain, dialog,net,session } from 'electron'
 import { DownloadManager } from '../managers/downloadManager'
 import { WindowManager } from './WindowManager'
 
@@ -9,26 +9,20 @@ export class IpcHandler {
         this.setupDownloadHandlers() // 下载
         this.setupWallpaperHandlers() // 壁纸
         this.setupWindowStateListeners() // 窗口状态
+        this.setupVideoProxyHandlers() // 视频代理
     }
     // 窗口控制
     static setupWindowControls() {
-        ipcMain.on('window-minimize', () => {
-            WindowManager.getMainWindow()?.minimize()
-        })
+        ipcMain.on('window-minimize', () => WindowManager.getMainWindow()?.minimize())
         ipcMain.on('window-toggle-maximize', () => {
             const mainWindow = WindowManager.getMainWindow()
             if (mainWindow) {
-                if (mainWindow.isMaximized()) {
-                    mainWindow.unmaximize()
-                } else {
-                    mainWindow.maximize()
-                }
+                if (mainWindow.isMaximized()) mainWindow.unmaximize()
+                else mainWindow.maximize()
                 mainWindow.webContents.send('window-state-changed', mainWindow.isMaximized())
             }
         })
-        ipcMain.on('window-close', () => {
-            WindowManager.getMainWindow()?.hide()
-        })
+        ipcMain.on('window-close', () => WindowManager.getMainWindow()?.hide())
     }
     // 对话框
     static setupDialogHandlers() {
@@ -110,4 +104,15 @@ export class IpcHandler {
         }
     }
 
+    // 视频代理
+    static setupVideoProxyHandlers() {
+        // 直接设置，因为此时应用已经ready了
+        session.defaultSession.webRequest.onBeforeSendHeaders(
+            { urls: ['*://*.bilivideo.com/*'] },
+            (details, callback) => {
+                details.requestHeaders['Referer'] = 'https://www.bilibili.com'
+                callback({ requestHeaders: details.requestHeaders })
+            }
+        )
+    }
 }

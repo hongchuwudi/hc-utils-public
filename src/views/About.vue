@@ -26,12 +26,12 @@
               <p class="text-sm text-gray-500 dark:text-gray-400 mt-0">探索我的技术世界与成长历程</p>
             </div>
           </div>
-          <div class="flex items-center space-x-2">
+          <div class="flex items-center space-x-2 mr-4">
             <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs font-medium">
-              Java后端开发
+              Vue3 前端开发
             </span>
-            <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-xs font-medium">
-              可实习6个月+
+            <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-xs font-medium ">
+              Java/Go 后端开发
             </span>
           </div>
         </div>
@@ -46,7 +46,7 @@
             <!-- 头像区域 -->
             <div class="flex flex-col items-center text-center mb-6">
               <div class="relative w-28 h-28 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg mb-4 ring-4 ring-white dark:ring-gray-800">
-                <span class="text-3xl font-bold text-white">虹</span>
+                <img src="../../public/favicon.ico">
                 <!-- 在线状态指示器 -->
                 <div class="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded-full ring-2 ring-white dark:ring-gray-800"></div>
               </div>
@@ -181,17 +181,15 @@
                   <span class="w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
                   <span>熟练掌握 <strong>SpringAI</strong> 、 <strong>SpringBoot</strong> 、<strong>Mybatis</strong>等框架中间件，了解IOC、AOP、Bean声明周期,依赖注入原理,了解<strong>JUC</strong>并发编程、如多线程实现、锁机制 和 <strong>JVM</strong>虚拟机GC流程
                   </span>
-
                 </div>
-
                 <div class="flex items-start">
                   <span class="w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
-                  <span>熟悉常见的<strong>设计模式</strong>如工厂模式、单例模式、代理模式等</span>
+                  <span>熟悉常见的<strong>设计模式</strong>如工厂模式、单例模式、享元模式等</span>
                 </div>
 
                 <div class="flex items-start">
                   <span class="w-1.5 h-1.5 bg-purple-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
-                  <span>了解HTML、CSS、JavaScript、<strong>Vue3</strong>、Vue router、pinia等前端技术和前后端分离架构</span>
+                  <span>熟悉HTML、CSS、JavaScript、<strong>Vue3</strong>、Vue router、pinia等前端技术</span>
                 </div>
 
                 <div class="flex items-start">
@@ -201,7 +199,7 @@
 
                 <div class="flex items-start">
                   <span class="w-1.5 h-1.5 bg-orange-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
-                  <span>了解Docker 容器化部署及其指令、Linux 基本指令如ls，mkdir等和vim编辑器的简单使用</span>
+                  <span>熟悉Docker 容器化部署及其指令、了解Linux 基本指令和vim/nano的基本使用</span>
                 </div>
 
                 <div class="flex items-start">
@@ -238,7 +236,7 @@
                 </div>
                 <div class="bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-700/30 dark:to-slate-700/30 rounded-xl p-3 border border-gray-200 dark:border-gray-600/30 transition-all duration-300 hover:shadow-md">
                   <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">数据库工具</div>
-                  <div class="text-sm font-medium text-gray-900 dark:text-white">MySQL Workbench</div>
+                  <div class="text-sm font-medium text-gray-900 dark:text-white">DataGrip</div>
                 </div>
               </div>
               <!-- 开发软件 -->
@@ -468,7 +466,7 @@ export default {
       ide: {
         title: '开发工具',
         data: {
-          'Java IDE': 'IntelliJ IDEA Ultimate',
+          'Java IDE': 'IntelliJ IDEA',
           '前端 IDE': 'Visual Studio Code',
           '数据库工具': 'MySQL Workbench 8.0'
         }

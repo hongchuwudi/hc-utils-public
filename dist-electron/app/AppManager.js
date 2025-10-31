@@ -21,12 +21,12 @@ class AppManager {
     // 初始化图标管理器
     static initializeIconManager() {
         const iconBasePath = this.isDev
-            ? path_1.default.join(__dirname, '../../public/icos')
-            : path_1.default.join(process.resourcesPath, 'app.asar.unpacked/public/icos'); // 生产环境
+            ? path_1.default.join(__dirname, '../../public/icos') //  开发环境
+            : path_1.default.join(__dirname, '../../public/icos'); //  生产环境
         iconManager_1.IconManager.initialize(iconBasePath);
         iconManager_1.IconManager.checkAvailableIcons();
     }
 }
 exports.AppManager = AppManager;
 AppManager.isQuitting = false;
-AppManager.isDev = false;
+AppManager.isDev = false; // 是否为开发环境(默认生产环境)

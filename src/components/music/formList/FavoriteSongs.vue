@@ -32,7 +32,7 @@
 <script setup lang="ts">
 import { onMounted, computed, ref, watch } from 'vue'
 import SongList from '@/components/music/formList/SongList.vue'
-import type { UnifiedMusicItem } from '../../../api/music.ts'
+import type { UnifiedMusicItem } from '../../../types/music/music.ts'
 import { usePlayerStore } from '../../../stores/playerStore.ts'
 import { useFavoriteStore } from '../../../stores/favoriteStore.ts'
 import { message } from 'ant-design-vue'

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { type UnifiedMusicItem} from '../api/music'
-import { getMusicDetail } from '../api/music.ts'
+import { type UnifiedMusicItem } from '../types/music/music.ts'
+import { getMusicDetail } from '../api/music/music.ts'
 
 export const usePlayerStore = defineStore('player', () => {
     // 播放状态
@@ -15,13 +15,15 @@ export const usePlayerStore = defineStore('player', () => {
     const selectedBr = ref<string>('')
     const searchKeyword = ref<string>('')
     const playbackRate = ref(1.0) // 播放倍速
-
     // 播放列表相关
     const playList = ref<UnifiedMusicItem[]>([])
     const currentSongIndex = ref(-1)
     const isBrChanging = ref(false)
     const currentApi = ref<'qq' | 'wyy' | 'kw' | 'qishui'>('qq')
     const currentListMode = ref<'search' | 'downloaded' | 'favorite'>('search')
+
+    // 是否显示底部播放栏
+    const showBottomPlayer = ref<boolean>(true)
 
     // 音频元素引用
     let audioElement: HTMLAudioElement | null = null
@@ -88,6 +90,10 @@ export const usePlayerStore = defineStore('player', () => {
         const source = currentSong.value.source as keyof typeof brOptionsConfig
         return brOptionsConfig[source] || []
     })
+    const isShowBottomPlayer = computed(() => showBottomPlayer.value)
+
+    // 是否显示底部播放器
+    const toggleBottomPlayer = () => showBottomPlayer.value = !showBottomPlayer.value
 
     // 设置当前列表模式
     const setCurrentListMode = (mode: 'search' | 'downloaded' | 'favorite') => currentListMode.value = mode
@@ -176,7 +182,7 @@ export const usePlayerStore = defineStore('player', () => {
 
             // 2. 只在search模式下使用 id + source 匹配
             if (currentListMode.value === 'search')
-                if (String(s.id) === String(song.id) && s.source === song.source) {
+                if ((String(s.id) === String(song.id) || (String(s.n) === String(song.n))) && s.source === song.source) {
                     console.log('✅ id+source匹配:', s.title)
                     return true
                 }
@@ -339,6 +345,7 @@ export const usePlayerStore = defineStore('player', () => {
         currentSongIndex,
         isBrChanging,
         currentListMode,
+        showBottomPlayer,
 
         // 计算属性
         progress,
@@ -346,8 +353,10 @@ export const usePlayerStore = defineStore('player', () => {
         hasCurrentSong,
         brOptions,
         playListModelText,
+        isShowBottomPlayer,
 
         // 方法
+        toggleBottomPlayer,
         setPlaybackRate,
         setPlaybackRateFromSlider,
         initAudioElement,

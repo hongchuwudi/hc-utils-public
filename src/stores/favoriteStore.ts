@@ -1,7 +1,7 @@
 // stores/favoriteStore.ts
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { UnifiedMusicItem } from '../api/music'
+import type { UnifiedMusicItem } from '../types/music/music.ts'
 import type {DownloadedMusicItem} from "../types/electron";
 
 export const useFavoriteStore = defineStore('favorite', () => {

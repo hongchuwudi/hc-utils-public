@@ -11,27 +11,22 @@ class IpcHandler {
         this.setupDownloadHandlers(); // 下载
         this.setupWallpaperHandlers(); // 壁纸
         this.setupWindowStateListeners(); // 窗口状态
+        this.setupVideoProxyHandlers(); // 视频代理
     }
     // 窗口控制
     static setupWindowControls() {
-        electron_1.ipcMain.on('window-minimize', () => {
-            WindowManager_1.WindowManager.getMainWindow()?.minimize();
-        });
+        electron_1.ipcMain.on('window-minimize', () => WindowManager_1.WindowManager.getMainWindow()?.minimize());
         electron_1.ipcMain.on('window-toggle-maximize', () => {
             const mainWindow = WindowManager_1.WindowManager.getMainWindow();
             if (mainWindow) {
-                if (mainWindow.isMaximized()) {
+                if (mainWindow.isMaximized())
                     mainWindow.unmaximize();
-                }
-                else {
+                else
                     mainWindow.maximize();
-                }
                 mainWindow.webContents.send('window-state-changed', mainWindow.isMaximized());
             }
         });
-        electron_1.ipcMain.on('window-close', () => {
-            WindowManager_1.WindowManager.getMainWindow()?.hide();
-        });
+        electron_1.ipcMain.on('window-close', () => WindowManager_1.WindowManager.getMainWindow()?.hide());
     }
     // 对话框
     static setupDialogHandlers() {
@@ -111,6 +106,14 @@ class IpcHandler {
             mainWindow.on('maximize', () => mainWindow.webContents.send('window-state-changed', true));
             mainWindow.on('unmaximize', () => mainWindow.webContents.send('window-state-changed', false));
         }
+    }
+    // 视频代理
+    static setupVideoProxyHandlers() {
+        // 直接设置，因为此时应用已经ready了
+        electron_1.session.defaultSession.webRequest.onBeforeSendHeaders({ urls: ['*://*.bilivideo.com/*'] }, (details, callback) => {
+            details.requestHeaders['Referer'] = 'https://www.bilibili.com';
+            callback({ requestHeaders: details.requestHeaders });
+        });
     }
 }
 exports.IpcHandler = IpcHandler;

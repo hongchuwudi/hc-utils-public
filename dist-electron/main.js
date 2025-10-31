@@ -5,7 +5,7 @@ const AppManager_1 = require("./app/AppManager");
 const isDev = process.env.NODE_ENV === 'development';
 // 初始化应用
 electron_1.app.whenReady().then(() => {
-    console.log('[app] ready');
+    console.log('[app] ready就绪....');
     AppManager_1.AppManager.initialize(isDev);
 });
 // 应用事件处理

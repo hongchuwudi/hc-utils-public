@@ -48,6 +48,15 @@
             tooltip="帮助"
             tooltip-position="bottom"
         />
+        <!-- 是否显示底部播放栏-->
+        <ProButton
+            type="secondary"
+            size="sm"
+            :icon="playStore.isShowBottomPlayer ? Eye : EyeOff"
+            @click="playStore.toggleBottomPlayer"
+            :tooltip="playStore.isShowBottomPlayer ? '隐藏底部播放栏' : '显示底部播放栏'"
+            tooltip-position="bottom"
+        />
         <ProButton
             type="secondary"
             size="sm"
@@ -101,7 +110,7 @@
 
 <script setup lang="ts">
 import { ref, watch,computed } from 'vue'
-import {ArrowLeft, Search, ListMusic, TextSearch, FolderCog, FolderHeart, Info} from 'lucide-vue-next'
+import {ArrowLeft, Search, ListMusic, TextSearch, FolderCog, FolderHeart, Info, Eye, EyeOff} from 'lucide-vue-next'
 import ProButton from '@/components/common/proButton.vue'
 import SearchSelect from '@/components/common/SearchSelect.vue'
 import { usePlayerStore } from '../../../stores/playerStore.ts'

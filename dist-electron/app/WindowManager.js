@@ -39,9 +39,8 @@ class WindowManager {
             this.mainWindow.loadURL('http://localhost:5173');
             this.mainWindow.webContents.openDevTools();
         }
-        else {
+        else
             this.mainWindow.loadFile(path_1.default.join(__dirname, '../../dist/index.html'));
-        }
         this.setupWindowEvents();
     }
     static setupWindowEvents() {

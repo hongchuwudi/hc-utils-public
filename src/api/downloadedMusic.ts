@@ -1,5 +1,5 @@
 // api/downloadedMusic.ts
-import type { UnifiedMusicItem } from './music'
+import type { UnifiedMusicItem } from '../types/music/music.ts'
 
 export interface DownloadedMusicItem extends UnifiedMusicItem {
     filePath: string

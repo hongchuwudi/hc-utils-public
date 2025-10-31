@@ -6,7 +6,7 @@ import path from 'path'
 
 export class AppManager {
     public static isQuitting = false
-    private static isDev: boolean = false
+    private static isDev: boolean = false      // 是否为开发环境(默认生产环境)
 
     // 初始化应用
     static initialize(isDev: boolean) {
@@ -20,9 +20,10 @@ export class AppManager {
     // 初始化图标管理器
     private static initializeIconManager() {
         const iconBasePath = this.isDev
-            ? path.join(__dirname, '../../public/icos')        //  开发环境
-            : path.join(process.resourcesPath, 'public/icos')  //  生产环境
+            ? path.join(__dirname, '../../public/icos') //  开发环境
+            : path.join(__dirname, '../../public/icos') //  生产环境
         IconManager.initialize(iconBasePath)
         IconManager.checkAvailableIcons()
     }
+
 }

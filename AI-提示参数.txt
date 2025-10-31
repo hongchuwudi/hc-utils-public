@@ -1,0 +1,42 @@
+1.这是一个vue3项目,使用tailwindcss和typescript
+2.使用lucideicons图标库
+3.使用pinia进行状态管理
+4.使用vue-router进行路由管理
+5.使用axios进行http请求
+6.项目结构清晰,组件化开发
+7.使用vite作为构建工具
+8.支持响应式设计,适配不同屏幕尺寸
+
+要求:
+1.代码简介,易读,易维护
+2.遵循单一职责原则
+3.组件化开发,提高复用性
+
+现有规范:
+通用:
+1.ts不加;
+2.{}能省则省略,短if单行代码写一行内 如if(condition) doSomething()
+3.所有规律性的代码都要列整齐化(竖着对齐相当于\t制表了) 比如数组对象的属性等,导入语句等,这样我看起来舒服
+4.使用()=>{}而不是function(){}定义函数,一个参数时省略括号,一行代码省略大括号
+5.使用async/await处理异步操作
+6.使用ES6模块化语法import/export
+7.使用模板字符串而不是字符串拼接
+8.使用解构赋值简化代码
+
+api:
+1.vite中用 /api 代理后端地址 所有接口以这个开头
+2.使用request.ts拦截请求和响应
+3.所有接口请求放在 /src/api 目录下
+
+组件:
+1.公共组件放在 /src/components/common 目录下
+2.业务组件放在 /src/components/business 目录下
+3.组件命名使用大驼峰命名法
+4.组件props和emits使用typescript类型定义
+
+状态管理:
+1.使用pinia进行状态管理
+2.状态管理文件放在 /src/store 目录下
+3.使用大驼峰命名法命名store
+4.状态和方法使用typescript类型定义
+

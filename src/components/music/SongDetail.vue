@@ -10,8 +10,7 @@
           v-bind="attrs"
       >
         <!-- 壁纸背景 - 放在最底层 -->
-        <WallpaperBackground />
-
+        <WallpaperBackground ref="wallpaperRef"/>
 
         <!-- 顶部导航栏 -->
         <div class="bg-white/20 dark:bg-gray-800/20 backdrop-blur-md border-b border-gray-200/30 dark:border-gray-700/30 px-4 py-3 shadow-sm z-[100]">
@@ -29,6 +28,24 @@
             </div>
 
             <div class="flex items-center gap-3">
+              <!-- 同步视频和音频-->
+              <ProButton
+                  type="secondary"
+                  size="sm"
+                  :icon="RefreshCcwDot "
+                  @click="syncBgAndSong(0,0)"
+                  tooltip="同步封面和背景"
+                  tooltip-position="bottom"
+              />
+              <!-- 是否显示底部播放栏-->
+              <ProButton
+                  type="secondary"
+                  size="sm"
+                  :icon="playStore.isShowBottomPlayer ? Eye : EyeOff"
+                  @click="playStore.toggleBottomPlayer"
+                  :tooltip="playStore.isShowBottomPlayer ? '隐藏底部播放栏' : '显示底部播放栏'"
+                  tooltip-position="bottom"
+              />
               <!-- 是否显示封面-->
               <ProButton
                   type="secondary"
@@ -116,17 +133,23 @@
             <div v-if="isShowCover" class="relative">
               <!-- 波纹效果 -->
               <div
-                  v-for="i in 3"
+                  v-for="i in 4"
                   :key="i"
-                  class="absolute inset-0 rounded-full border-2 border-blue-300/30 dark:border-blue-500/30"
-                  :class="`ripple-${i}`"
+                  class="absolute rounded-full border-3 shadow-lg"
+                  :class="[
+                      `ripple-${i}`,
+                      i === 1 ? 'border-blue-400/70 shadow-blue-400/40' :
+                      i === 2 ? 'border-blue-300/60 shadow-blue-300/30' :
+                      i === 3 ? 'border-blue-300/50 shadow-blue-300/20' :
+                      'border-blue-200/40 shadow-blue-200/10'
+                  ]"
                   :style="{
-                  width: `${40 + i * 20}%`,
-                  height: `${40 + i * 20}%`,
-                  top: `${30 - i * 10}%`,
-                  left: `${30 - i * 10}%`,
-                  animationDelay: `${i * 0.5}s`
-                }"
+                      width: `${40 + i * 20}%`,
+                      height: `${40 + i * 20}%`,
+                      top: `${30 - i * 10}%`,
+                      left: `${30 - i * 10}%`,
+                      animationDelay: `${i * 0.5}s`
+                  }"
               ></div>
               <!-- 歌曲封面 -->
               <div  class="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden shadow-2xl">
@@ -178,41 +201,39 @@
                 @wheel="handleWheel"
                 :class="{ 'min-h-0': isMobileTerminal }"
             >
-              <div class="py-4" :class="{ 'px-4': isMobileTerminal }">
-                <!-- 显示所有歌词，但非当前范围的歌词隐藏 -->
-                <div
-                    v-for="(line, index) in parsedLyrics"
-                    :key="index"
-                    ref="lyricLines"
-                    class="py-3 px-4 rounded-lg transition-all duration-300 cursor-pointer text-center lyric-item w-full max-w-md"
-                    :class="[getLyricLineClass(index), { 'w-full': isMobileTerminal }]"
-                    :style="getLyricProgressStyle(index)"
-                    @click="seekToLyric(line.time)"
-                >
-                  {{ line.text }}
-                </div>
+              <div
+                  v-for="(line, index) in parsedLyrics"
+                  :key="index"
+                  ref="lyricLines"
+                  class="py-3 px-4 rounded-lg transition-all duration-300 cursor-pointer text-center lyric-item w-full max-w-md"
+                  :class="[getLyricLineClass(index), { 'w-full': isMobileTerminal }]"
+                  @click="seekToLyric(line.time)"
+              >
+                <span class="lyric-text" :style="getLyricProgressStyle(index)">
+                    {{ line.text }}
+                </span>
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </Transition>
   </Teleport>
 </template>
 
 <script setup lang="ts">
-import {ArrowLeft, Download, Link,AudioWaveform,AudioLines,LineSquiggle,Activity,FileDown,Eye,EyeOff} from 'lucide-vue-next'
+import {ArrowLeft, Download, Link,AudioWaveform,AudioLines,LineSquiggle,Activity,FileDown,Eye,EyeOff,RefreshCcwDot} from 'lucide-vue-next'
 import { ref, computed, watch, nextTick, onMounted, onUnmounted ,useAttrs} from 'vue'
 import ProButton from '@/components/common/proButton.vue'
 import { message } from 'ant-design-vue'
-import { throttle } from 'lodash-es'
 import { useWindowSize } from '@vueuse/core';
 import AudioWaveform1 from "@/components/music/wave/AudioWaveform1.vue";
 import AudioWaveform2 from "@/components/music/wave/AudioWaveform2.vue";
 import AudioWaveform3 from "@/components/music/wave/AudioWaveform3.vue";
 import { openExternalLink } from '../../utils/env.ts'
 import WallpaperBackground from "@/components/donghua/WallpaperBackground.vue";
+import {usePlayerStore} from "../../stores/playerStore.ts";
+import {useWallpaperStore} from "../../stores/wallpaperStore.ts";
 interface LyricLine {time: number,text: string}
 const props = defineProps<{
   show: boolean
@@ -251,6 +272,9 @@ const lyricProgress = ref(0)
 const isShowWave = ref(0)
 const { width } = useWindowSize();
 const attrs = useAttrs()                      // 使用 useAttrs 来接收其他非props属性
+const playStore = usePlayerStore()
+const paperStore = useWallpaperStore()
+const wallpaperRef = ref()
 let scrollTimeout: number | null = null       // 手动滚动定时器
 let manualScrollTimeout: number | null = null // 手动滚动后的保护期
 
@@ -312,6 +336,19 @@ const parsedLyrics = computed((): LyricLine[] => {
   }
 })
 
+// 同步背景视频和音乐
+const syncBgAndSong = (songTime: number, videoProgress: number): void => {
+  // 同步音乐
+  if (playStore.currentSong) playStore.seekAudio(songTime)
+
+  // 同步视频壁纸
+  if (paperStore.currentWallpaper?.type === 'video') {
+    // 确保进度在有效范围内
+    const validProgress = Math.max(0, Math.min(1, videoProgress))
+    if (wallpaperRef.value) wallpaperRef.value.forceSetProgress(validProgress)
+  }
+}
+
 // 判断是否为有效的 HTTP/HTTPS 链接
 const isValidHttpUrl = (url: string): boolean => {
   if (!url) return false
@@ -322,12 +359,8 @@ const isValidHttpUrl = (url: string): boolean => {
 const openSourceLink = async () => {
   if (props.currentSong?.link) {
     const success = await openExternalLink(props.currentSong.link)
-    if (!success) {
-      message.error('无法打开链接')
-    }
-  } else {
-    message.info('该歌曲没有来源链接')
-  }
+    if (!success) message.error('无法打开链接')
+  } else message.info('该歌曲没有来源链接')
 }
 
 // 添加进度样式函数
@@ -335,22 +368,40 @@ const getLyricProgressStyle = (index: number) => {
   const isPreview = manualScroll.value && index === currentLyricIndex.value
   const isActual = !manualScroll.value && index === currentLyricIndex.value
 
-  if (isPreview || isActual) {
-    const progressPercent = Math.round(lyricProgress.value * 100)
-    const fromColor = isPreview ? '#f97316' : '#3b82f6' // 橙色或蓝色
-    const toColor = '#9ca3af' // 灰色
+  if (!isPreview && !isActual) return {}
 
-    return {
-      background: `linear-gradient(90deg, ${fromColor} 0%, ${fromColor} ${progressPercent}%, ${toColor} ${progressPercent}%, ${toColor} 100%)`,
-      backgroundClip: 'text',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent'
+  if (currentLyricIndex.value >= 0) {
+    const lineDiff = index - currentLyricIndex.value
+
+    // 如果是当前行，使用正常的 lyricProgress
+    if (lineDiff === 0) {
+      const progressPercent = Math.round(lyricProgress.value * 100)
+      const fromColor = isPreview ? '#f97316' : '#3b82f6'
+      const toColor = '#9ca3af'
+
+      return {
+        background: `linear-gradient(90deg, ${fromColor} 0%, ${fromColor} ${progressPercent}%, ${toColor} ${progressPercent}%, ${toColor} 100%)`,
+        backgroundClip: 'text',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent'
+      }
+    }
+    // 如果是之前的行，显示完整颜色
+    else if (lineDiff < 0) {
+      const fromColor = isPreview ? '#f97316' : '#3b82f6'
+      return {
+        background: `linear-gradient(90deg, ${fromColor} 0%, ${fromColor} 100%)`,
+        backgroundClip: 'text',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent'
+      }
     }
   }
+
   return {}
 }
 
-// 保留你喜欢的配色方案
+// 你的原函数完全不用改
 const getLyricLineClass = (index: number) => {
   const isPreview = manualScroll.value && index === currentLyricIndex.value
   const isActual = !manualScroll.value && index === currentLyricIndex.value
@@ -358,12 +409,12 @@ const getLyricLineClass = (index: number) => {
   if (!isInRange) return 'hidden'
   const distance = Math.abs(index - currentLyricIndex.value)
   const baseClasses = 'transition-all duration-300' // 基础样式
-  // 根据距离当前歌词的远近设置不同样式
-  if (isPreview) return `${baseClasses} text-2xl font-bold bg-gradient-to-r from-orange-500 to-gray-500 bg-clip-text text-transparent` // 预览状态：橙色渐变
-  else if (isActual) return `${baseClasses} text-2xl font-bold bg-gradient-to-r from-blue-500 to-gray-500 bg-clip-text text-transparent` // 实际播放状态：蓝色渐变
-  else if (distance === 1) return `${baseClasses} text-xl font-medium opacity-80 dark:opacity-70 text-gray-700 dark:text-gray-300` // 相邻歌词：稍大
-  else if (distance === 2) return `${baseClasses} text-lg opacity-60 dark:opacity-50 text-gray-600 dark:text-gray-400` // 隔一行歌词：正常
-  else return `${baseClasses} text-base opacity-40 dark:opacity-30 text-gray-500 dark:text-gray-500` // 其他歌词：较小
+
+  if (isPreview) return `${baseClasses} text-2xl font-bold current-lyric-preview`
+  else if (isActual) return `${baseClasses} text-2xl font-bold current-lyric-actual`
+  else if (distance === 1) return `${baseClasses} text-xl font-medium opacity-80 dark:opacity-70 text-gray-700 dark:text-gray-300`
+  else if (distance === 2) return `${baseClasses} text-lg opacity-60 dark:opacity-50 text-gray-600 dark:text-gray-400`
+  else return `${baseClasses} text-base opacity-40 dark:opacity-30 text-gray-500 dark:text-gray-500`
 }
 
 // 判断歌词是否在可见范围内
@@ -460,76 +511,72 @@ const handleDetailWheel = (event: WheelEvent) => {
 }
 
 // 更新当前歌词,在手动滚动时跳过自动滚动
+// 缓存上一次的结果，避免重复计算
+let lastLyricIndex = -1
 const updateCurrentLyric = (time: number) => {
-  // 如果是手动滚动模式，跳过自动更新
-  if (manualScroll.value) {
-    return
-  }
+  console.log('更新当前歌词时间:', time)
 
+  if (manualScroll.value) return
   if (parsedLyrics.value.length === 0) {
     currentLyricIndex.value = -1
     lyricProgress.value = 0
     return
   }
 
-  let left = 0
-  let right = parsedLyrics.value.length - 1
-  let newIndex = -1
+  // 性能优化1：只在时间有显著变化时更新
+  if (Math.abs(time - lastUpdateTime) < 0.1) return
 
-  // 二分查找
-  while (left <= right) {
-    const mid = Math.floor((left + right) / 2)
-    const lyric = parsedLyrics.value[mid]
+  lastUpdateTime = time
 
-    if (!lyric) break
+  // 性能优化2：简化二分查找
+  const newIndex = findCurrentLyricIndex(time)
 
-    const lyricTime = lyric.time
-
-    if (time >= lyricTime) {
-      newIndex = mid
-      left = mid + 1
-    } else {
-      right = mid - 1
-    }
-  }
-
-  // 更新当前歌词索引
-  if (currentLyricIndex.value !== newIndex) {
+  // 性能优化3：只有索引变化时才更新DOM
+  if (lastLyricIndex !== newIndex) {
+    lastLyricIndex = newIndex
     currentLyricIndex.value = newIndex
-    if (newIndex >= 0 && !manualScroll.value) {
+
+    if (newIndex >= 0) {
       scrollToCurrentLyric()
     }
   }
 
-  // 更新渐变进度
+  // 性能优化3：简化进度计算
   if (newIndex >= 0) {
     const currentLyric = parsedLyrics.value[newIndex]
     const nextLyric = parsedLyrics.value[newIndex + 1]
 
-    if (!currentLyric) {
-      lyricProgress.value = 0
-      return
-    }
-
-    if (nextLyric) {
+    if (currentLyric && nextLyric) {
       const segmentDuration = nextLyric.time - currentLyric.time
       if (segmentDuration > 0) {
-        const progressInSegment = time - currentLyric.time
-        lyricProgress.value = Math.max(0, Math.min(1, progressInSegment / segmentDuration))
+        lyricProgress.value = Math.max(0, Math.min(1, (time - currentLyric.time) / segmentDuration))
       } else {
         lyricProgress.value = 1
       }
     } else {
-      const remainingTime = props.duration - currentLyric.time
-      if (remainingTime > 0) {
-        lyricProgress.value = Math.max(0, Math.min(1, (time - currentLyric.time) / remainingTime))
-      } else {
-        lyricProgress.value = 1
-      }
+      lyricProgress.value = currentLyric ? 1 : 0
     }
   } else {
     lyricProgress.value = 0
   }
+}
+
+// 二分查找
+const findCurrentLyricIndex = (time: number): number => {
+  let left = 0
+  let right = parsedLyrics.value.length - 1
+  let result = -1
+
+  while (left <= right) {
+    const mid = (left + right) >> 1 // 使用位运算替代 Math.floor
+    const lyricTime = parsedLyrics.value[mid]?.time || 0
+
+    if (time >= lyricTime) {
+      result = mid
+      left = mid + 1
+    } else right = mid - 1
+  }
+  return result
 }
 
 // 平滑滚动到当前歌词
@@ -565,19 +612,42 @@ const scrollToCurrentLyric = async () => {
   }
 }
 
-// 监听当前播放时间
-const throttledUpdate = throttle((time: number) => {
-  updateCurrentLyric(time + 0.45 )
-}, 16) // FPS:60
 
+
+let rafId: number = 0 // 高频率更新歌词(流畅效果）
+let lastUpdateTime = 0  // 监听当前播放时间
+
+const rafUpdate = () => {
+  const now = Date.now()
+
+  // 每100ms更新一次（10fps）
+  if (now - lastUpdateTime >= 100) {
+    // 直接从 audio 元素获取最新时间，绕过 props 的延迟
+    const audioElement = document.querySelector('audio') as HTMLAudioElement
+    if (audioElement) {
+      const currentTime = audioElement.currentTime
+      updateCurrentLyric(currentTime + 0.46) // 时间补偿:因为人声一般都是提前一点的
+    }
+    lastUpdateTime = now
+  }
+
+  rafId = requestAnimationFrame(rafUpdate)
+}
+
+// 监听播放状态，播放时启动RAF
+watch(() => props.isPlaying, (playing) => {
+  if (playing) {
+    lastUpdateTime = Date.now()
+    rafId = requestAnimationFrame(rafUpdate)
+  }
+  else cancelAnimationFrame(rafId)
+})
 // 在详情页显示时禁用背景滚动
 watch(() => props.show, (newVal) => {
   showDetail.value = newVal
   if (newVal) document.body.style.overflow = 'hidden'
   else document.body.style.overflow = ''
 })
-// 修改监听器
-watch(() => props.currentTime, (newTime) => throttledUpdate(newTime))
 // 监听歌词数据变化
 watch(parsedLyrics, () => {
   nextTick(() => {
@@ -628,56 +698,14 @@ onMounted(() => {
   const resizeObserver = new ResizeObserver(() => (currentLyricIndex.value >= 0 && !manualScroll.value) ? scrollToCurrentLyric() : 1)
   if (lyricsContainer.value) resizeObserver.observe(lyricsContainer.value)
 })
-onUnmounted(() => document.body.style.overflow = '')
-
+// 组件卸载时清理
+onUnmounted(() => {
+  document.body.style.overflow = ''
+  cancelAnimationFrame(rafId)
+})
 </script>
 
 <style scoped>
-/* 当前歌词进度渐变效果 */
-.current-lyric-preview {
-  background: linear-gradient(90deg, #f97316 0%, #f97316 var(--progress, 0%), #6b7280 var(--progress, 0%), #6b7280 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.current-lyric-actual {
-  background: linear-gradient(90deg, #3b82f6 0%, #3b82f6 var(--progress, 0%), #6b7280 var(--progress, 0%), #6b7280 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* 暗色主题适配 */
-.dark .current-lyric-preview {
-  background: linear-gradient(90deg, #f97316 0%, #f97316 var(--progress, 0%), #9ca3af var(--progress, 0%), #9ca3af 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.dark .current-lyric-actual {
-  background: linear-gradient(90deg, #3b82f6 0%, #3b82f6 var(--progress, 0%), #9ca3af var(--progress, 0%), #9ca3af 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-/* 弹窗动画 */
-.detail-slide-enter-active,
-.detail-slide-leave-active {
-  transition: all 0.3s ease;
-}
-
-.detail-slide-enter-from {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.detail-slide-leave-to {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
 /* 封面旋转动画 */
 .animate-spin {
   animation: spin 10s linear infinite;
@@ -691,49 +719,27 @@ onUnmounted(() => document.body.style.overflow = '')
 /* 水波纹动画 */
 .ripple-1,
 .ripple-2,
-.ripple-3 {
-  animation: ripple 3s infinite ease-in-out;
+.ripple-3,
+.ripple-4{
+  animation: ripple 2.5s infinite ease-in-out;
 }
 
 @keyframes ripple {
   0% {
-    transform: scale(1);
-    opacity: 0.7;
+    transform: scale(0.95);
+    opacity: 0.8;
+    border-width: 3px;
   }
   50% {
-    transform: scale(1.1);
-    opacity: 0.3;
+    transform: scale(1.05);
+    opacity: 0.4;
+    border-width: 2px;
   }
   100% {
-    transform: scale(1);
-    opacity: 0.7;
+    transform: scale(0.95);
+    opacity: 0.8;
+    border-width: 3px;
   }
-}
-
-/* 自定义滚动条样式 */
-.scrollbar-thin::-webkit-scrollbar {
-  width: 6px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.5);
-  border-radius: 3px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(156, 163, 175, 0.7);
-}
-
-.dark .scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: rgba(75, 85, 99, 0.5);
-}
-
-.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(75, 85, 99, 0.7);
 }
 
 /* 完全隐藏滚动条但保留滚动功能 */
@@ -742,16 +748,6 @@ onUnmounted(() => document.body.style.overflow = '')
   -ms-overflow-style: none; /* IE and Edge */
 }
 
-/* 歌词行过渡动画 */
-.lyric-line {
-  transition: all 0.3s ease-in-out;
-}
-
-/* 确保歌词容器有正确的滚动行为 */
-.lyrics-container {
-  display: flex;
-  flex-direction: column;
-}
 .lyric-item {
    text-align: center;
    width: 100%;
@@ -820,18 +816,5 @@ onUnmounted(() => document.body.style.overflow = '')
 /* 确保详情页内容可以滚动 */
 .flex-1.overflow-hidden {
   overflow: hidden;
-}
-
-.current-lyric-progress {
-  background: linear-gradient(90deg, #3b82f6 0%, #3b82f6 var(--progress, 0%), #6b7280 var(--progress, 0%), #6b7280 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-size: 200% 100%;
-}
-
-/* 动态更新 --progress 变量 */
-:deep(.current-lyric-progress) {
-  --progress: calc(var(--lyric-progress, 0) * 100%);
 }
 </style>

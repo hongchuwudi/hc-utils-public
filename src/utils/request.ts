@@ -13,11 +13,9 @@ request.interceptors.request.use(config => {
     return config
 })
 
-// 响应拦截 - 修复版本
+// 响应拦截
 request.interceptors.response.use(
-    (response) => {
-        return response.data
-    },
+    (response) => response.data,
     (error) => {
         console.error('响应错误:', error)
         const errorMessage = error.response?.data?.message

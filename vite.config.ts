@@ -13,6 +13,14 @@ export default defineConfig({
   server: {
     port: 5173,
     open: false, // false避免同时打开浏览器和 Electron
+    proxy: {
+      // API 请求代理
+      '/api': {
+        target: 'http://localhost:16666', // 后端地址
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '') // 重写路径
+      },
+    }
   },
   build: {
     outDir: 'dist',

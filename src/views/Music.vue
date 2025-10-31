@@ -76,7 +76,7 @@
     />
     <!-- 底部播放控制栏 -->
     <BottomPlayer
-        v-if="playerStore.hasCurrentSong"
+        v-if="playerStore.hasCurrentSong && playerStore.isShowBottomPlayer"
         :current-song="playerStore.currentSong"
         :is-playing="playerStore.isPlaying"
         :current-time="playerStore.currentTime"
@@ -101,7 +101,7 @@
 
     />
     <!-- 默认播放控制栏 -->
-    <DefaultPlayController v-else />
+    <DefaultPlayController v-else-if="!playerStore.hasCurrentSong && playerStore.isShowBottomPlayer" />
     <!-- 下载音质选择模态框 -->
     <DownloadQualitySelect
         ref="downloadQualitySelectRef"
@@ -111,20 +111,21 @@
   </div>
 </template>
 <script setup lang="ts">
-import SongDetail from "@/components/music/SongDetail.vue"
-import DownloadQualitySelect from '@/components/music/DownloadQualitySelect.vue'
-import DefaultPlayController from "@/components/music/DefaultPlayController.vue"
-import DownloadedMusic from '@/components/music/formList/DownloadedMusic.vue'
-import BottomPlayer from "@/components/music/BottomPlayer.vue"
-import SongList from "@/components/music/formList/SongList.vue"
-import FavoriteHeader from "@/components/music/header/FavoriteHeader.vue"
-import DownloadedHeader from "@/components/music/header/DownloadedHeader.vue"
-import SearchHeader from "@/components/music/header/SearchHeader.vue"
-import FavoriteSongs from "@/components/music/formList/FavoriteSongs.vue"
+import SongDetail from             "@/components/music/SongDetail.vue"
+import DownloadQualitySelect from  '@/components/music/DownloadQualitySelect.vue'
+import DefaultPlayController from  "@/components/music/DefaultPlayController.vue"
+import DownloadedMusic       from  '@/components/music/formList/DownloadedMusic.vue'
+import BottomPlayer          from  "@/components/music/BottomPlayer.vue"
+import SongList              from  "@/components/music/formList/SongList.vue"
+import FavoriteHeader        from  "@/components/music/header/FavoriteHeader.vue"
+import DownloadedHeader      from  "@/components/music/header/DownloadedHeader.vue"
+import SearchHeader          from  "@/components/music/header/SearchHeader.vue"
+import FavoriteSongs         from  "@/components/music/formList/FavoriteSongs.vue"
 
 import { message } from 'ant-design-vue'
-import { ref, onMounted, onUnmounted, watch,computed } from 'vue'
-import { searchMusic, getMusicDetail, type UnifiedMusicItem } from '../api/music.ts'
+import { ref, onMounted, watch,computed } from 'vue'
+import { searchMusic, getMusicDetail } from '../api/music/music.ts'
+import { type UnifiedMusicItem } from '../types/music/music.ts'
 import { useAppStore } from '../stores/index.ts'
 import { usePlayerStore } from '../stores/playerStore.ts'
 import { useDownloadStore } from '../stores/downloadStore.ts'
@@ -419,9 +420,8 @@ watch(selectedApi, (newApi) => {
   handleSearch()
 })
 // 生命周期
-onMounted(() => playerStore.selectedBr = defaultBrConfig[selectedApi.value])
-onUnmounted(() => {})
 onMounted(() => {
+  playerStore.selectedBr = defaultBrConfig[selectedApi.value]
   console.log('🔍 Electron API 调试信息:')
   console.log('window.electronAPI:', window.electronAPI)
   console.log('downloadMusic 方法:', window.electronAPI?.downloadMusic)
@@ -429,71 +429,71 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-.animate-spin {
-  animation: spin 10s linear infinite;
-}
+<!--<style scoped>-->
+<!--.animate-spin {-->
+<!--  animation: spin 10s linear infinite;-->
+<!--}-->
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
+<!--@keyframes spin {-->
+<!--  from { transform: rotate(0deg); }-->
+<!--  to { transform: rotate(360deg); }-->
+<!--}-->
 
-/* 使用深度选择器确保滚动条样式在动态高度下生效 */
-:deep(.custom-scrollbar) {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(59, 130, 246, 0.5) transparent;
-}
+<!--/* 使用深度选择器确保滚动条样式在动态高度下生效 */-->
+<!--:deep(.custom-scrollbar) {-->
+<!--  scrollbar-width: thin;-->
+<!--  scrollbar-color: rgba(59, 130, 246, 0.5) transparent;-->
+<!--}-->
 
-:deep(.custom-scrollbar)::-webkit-scrollbar {
-  width: 8px;
-}
+<!--:deep(.custom-scrollbar)::-webkit-scrollbar {-->
+<!--  width: 8px;-->
+<!--}-->
 
-:deep(.custom-scrollbar)::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 4px;
-}
+<!--:deep(.custom-scrollbar)::-webkit-scrollbar-track {-->
+<!--  background: transparent;-->
+<!--  border-radius: 4px;-->
+<!--}-->
 
-:deep(.custom-scrollbar)::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg,
-  rgba(59, 130, 246, 0.6) 0%,
-  rgba(37, 99, 235, 0.6) 50%,
-  rgba(59, 130, 246, 0.6) 100%);
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
-}
+<!--:deep(.custom-scrollbar)::-webkit-scrollbar-thumb {-->
+<!--  background: linear-gradient(180deg,-->
+<!--  rgba(59, 130, 246, 0.6) 0%,-->
+<!--  rgba(37, 99, 235, 0.6) 50%,-->
+<!--  rgba(59, 130, 246, 0.6) 100%);-->
+<!--  border-radius: 4px;-->
+<!--  border: 1px solid rgba(255, 255, 255, 0.2);-->
+<!--  transition: all 0.3s ease;-->
+<!--}-->
 
-:deep(.custom-scrollbar)::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg,
-  rgba(59, 130, 246, 0.8) 0%,
-  rgba(37, 99, 235, 0.8) 50%,
-  rgba(59, 130, 246, 0.8) 100%);
-}
+<!--:deep(.custom-scrollbar)::-webkit-scrollbar-thumb:hover {-->
+<!--  background: linear-gradient(180deg,-->
+<!--  rgba(59, 130, 246, 0.8) 0%,-->
+<!--  rgba(37, 99, 235, 0.8) 50%,-->
+<!--  rgba(59, 130, 246, 0.8) 100%);-->
+<!--}-->
 
-:deep(.custom-scrollbar)::-webkit-scrollbar-thumb:active {
-  background: linear-gradient(180deg,
-  rgba(29, 78, 216, 0.9) 0%,
-  rgba(30, 64, 175, 0.9) 50%,
-  rgba(29, 78, 216, 0.9) 100%);
-}
+<!--:deep(.custom-scrollbar)::-webkit-scrollbar-thumb:active {-->
+<!--  background: linear-gradient(180deg,-->
+<!--  rgba(29, 78, 216, 0.9) 0%,-->
+<!--  rgba(30, 64, 175, 0.9) 50%,-->
+<!--  rgba(29, 78, 216, 0.9) 100%);-->
+<!--}-->
 
-/* 暗色模式滚动条 */
-.dark :deep(.custom-scrollbar) {
-  scrollbar-color: rgba(96, 165, 250, 0.5) transparent;
-}
+<!--/* 暗色模式滚动条 */-->
+<!--.dark :deep(.custom-scrollbar) {-->
+<!--  scrollbar-color: rgba(96, 165, 250, 0.5) transparent;-->
+<!--}-->
 
-.dark :deep(.custom-scrollbar)::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg,
-  rgba(96, 165, 250, 0.6) 0%,
-  rgba(59, 130, 246, 0.6) 50%,
-  rgba(96, 165, 250, 0.6) 100%);
-}
+<!--.dark :deep(.custom-scrollbar)::-webkit-scrollbar-thumb {-->
+<!--  background: linear-gradient(180deg,-->
+<!--  rgba(96, 165, 250, 0.6) 0%,-->
+<!--  rgba(59, 130, 246, 0.6) 50%,-->
+<!--  rgba(96, 165, 250, 0.6) 100%);-->
+<!--}-->
 
-.dark :deep(.custom-scrollbar)::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg,
-  rgba(96, 165, 250, 0.8) 0%,
-  rgba(59, 130, 246, 0.8) 50%,
-  rgba(96, 165, 250, 0.8) 100%);
-}
-</style>
+<!--.dark :deep(.custom-scrollbar)::-webkit-scrollbar-thumb:hover {-->
+<!--  background: linear-gradient(180deg,-->
+<!--  rgba(96, 165, 250, 0.8) 0%,-->
+<!--  rgba(59, 130, 246, 0.8) 50%,-->
+<!--  rgba(96, 165, 250, 0.8) 100%);-->
+<!--}-->
+<!--</style>-->

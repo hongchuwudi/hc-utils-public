@@ -18,6 +18,7 @@
 
       <!-- 右侧：按钮 -->
       <div class="flex items-center gap-2 mr-2">
+
         <!-- 公告按钮 -->
         <ProButton
             type="secondary"
@@ -25,6 +26,15 @@
             :icon="Info"
             @click="showNotice = !showNotice"
             tooltip="帮助"
+            tooltip-position="bottom"
+        />
+        <!-- 是否显示底部播放栏-->
+        <ProButton
+            type="secondary"
+            size="sm"
+            :icon="playStore.isShowBottomPlayer ? Eye : EyeOff"
+            @click="playStore.toggleBottomPlayer"
+            :tooltip="playStore.isShowBottomPlayer ? '隐藏底部播放栏' : '显示底部播放栏'"
             tooltip-position="bottom"
         />
         <ProButton
@@ -109,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import {TextSearch, ListMusic, FolderCog, FolderHeart, Trash2, RefreshCw, Info} from 'lucide-vue-next'
+import {TextSearch, ListMusic, FolderCog, FolderHeart, Trash2, RefreshCw, Info, Eye, EyeOff} from 'lucide-vue-next'
 import ProButton from '@/components/common/proButton.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import { useDownloadStore } from '../../../stores/downloadStore.ts'
@@ -118,7 +128,9 @@ import {musicNotify} from "../../../text/musicNotify.ts";
 import { message } from 'ant-design-vue'
 import { ref } from 'vue'
 import NoticeBoard from "@/components/common/NoticeBoard.vue";
+import {usePlayerStore} from "../../../stores/playerStore.ts";
 
+const playStore = usePlayerStore()
 const downloadStore = useDownloadStore()
 const appStore = useAppStore()
 const confirmModal = ref()

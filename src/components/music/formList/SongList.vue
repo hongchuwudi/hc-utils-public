@@ -133,7 +133,7 @@
 <script setup lang="ts">
 import { Music, Play,Pause, Download, Share, Trash2, Heart , HeartOff as HeartOutline} from 'lucide-vue-next'
 import ProButton from '@/components/common/proButton.vue'
-import type { UnifiedMusicItem } from '../../../api/music.ts'
+import type { UnifiedMusicItem } from '../../../types/music/music.ts'
 import type { DownloadedMusicItem } from '../../../types/electron'
 import {useFavoriteStore} from "../../../stores/favoriteStore.ts"
 import {usePlayerStore} from "../../../stores/playerStore.ts"

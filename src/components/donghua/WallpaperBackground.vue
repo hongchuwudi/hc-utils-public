@@ -32,6 +32,8 @@ const wallpaperStore = useWallpaperStore()
 const currentWallpaper = computed(() => wallpaperStore.currentWallpaper)
 const videoVolume = computed(() => wallpaperStore.videoVolume)
 const videoElement = ref<HTMLVideoElement | null>(null)
+const videoProgress = computed(() => wallpaperStore.videoProgress)
+const shouldSetProgress = ref(false)
 
 // 监听音量变化并应用到视频元素
 watch(videoVolume, (newVolume) => {
@@ -55,6 +57,20 @@ watch(currentWallpaper, (newWallpaper) => {
   }
 })
 
+// 设置进度的方法
+const setVideoProgress = (progress: number) => {
+  if (videoElement.value && videoElement.value.duration) {
+    videoElement.value.currentTime = progress * videoElement.value.duration
+  }
+}
+// 监听进度变化，但只在需要时设置
+watch(videoProgress, (newProgress) => {
+  if (shouldSetProgress.value) {
+    setVideoProgress(newProgress)
+    shouldSetProgress.value = false
+  }
+})
+
 const handleVideoLoad = () => {
   console.log('✅ 视频壁纸加载成功')
   // 视频加载后立即设置音量
@@ -63,8 +79,18 @@ const handleVideoLoad = () => {
     videoElement.value.muted = videoVolume.value === 0
   }
 }
+
+// 暴露一个方法给外部调用，用于强制设置进度
+const forceSetProgress = (progress: number) => {
+  setVideoProgress(progress)
+}
+
 const handleLoad = () => console.log('✅ 图片壁纸加载成功')
 const handleError = (e: Event) => console.error('❌ 壁纸加载失败:', e)
+// 如果需要，可以暴露这个方法给父组件
+defineExpose({
+  forceSetProgress
+})
 </script>
 
 <style scoped>

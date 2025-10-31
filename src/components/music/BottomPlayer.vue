@@ -181,7 +181,7 @@ import ProgressBar from '@/components/common/ProgressBar.vue'
 import DefaultPlayController from '@/components/music/DefaultPlayController.vue'
 import { computed } from 'vue'
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Repeat, Repeat1, Shuffle, Heart as HeartSolid, HeartOff as HeartOutline  } from 'lucide-vue-next'
-import type { UnifiedMusicItem } from '../../api/music.ts'
+import type { UnifiedMusicItem } from '../../types/music/music.ts'
 import {usePlayerStore} from "../../stores/playerStore.ts";
 import PlaybackRateSlider from "@/components/music/PlaybackRateSlider.vue";
 

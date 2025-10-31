@@ -143,7 +143,7 @@
 import { ref, computed } from 'vue'
 import { Headphones, X, Settings, CheckCircle, Music } from 'lucide-vue-next'
 import {usePlayerStore} from "../../stores/playerStore.ts";
-import type { UnifiedMusicItem } from '../../api/music.ts'
+import type { UnifiedMusicItem } from '../../types/music/music.ts'
 
 interface QualityOption {
   value: string

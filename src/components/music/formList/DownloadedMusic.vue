@@ -45,7 +45,7 @@ import { usePlayerStore } from '../../../stores/playerStore.ts'
 import { useAppStore } from '../../../stores'
 import { useDownloadStore }     from '../../../stores/downloadStore.ts'
 import { useFavoriteStore } from "../../../stores/favoriteStore.ts";
-import { type UnifiedMusicItem } from '../../../api/music.ts'
+import { type UnifiedMusicItem } from '../../../types/music/music.ts'
 const playerStore = usePlayerStore()
 const appStore = useAppStore()
 const downloadStore = useDownloadStore()
